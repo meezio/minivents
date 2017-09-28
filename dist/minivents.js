@@ -4,26 +4,37 @@ function Events(target){
   /**
    *  On: listen to events
    */
-  target.on = function(type, func, ctx){
-    (events[type] = events[type] || []).push([func, ctx])
+  target.on = function(type, func, ctx, once){
+    once = !!once;
+    (events[type] = events[type] || []).push([func, ctx, once])
     return target
+  }
+  /**
+   *  One: listen to events once
+   */
+  target.one = function(type, func, ctx){
+    return target.on(type, func, ctx, true)
   }
   /**
    *  Off: stop listening to event / specific callback
    */
   target.off = function(type, func){
     type || (events = {})
-    var list = events[type] || empty,
-        i = list.length = func ? list.length : 0;
-    while(i--) func == list[i][0] && list.splice(i,1)
+    var list = events[type] || empty, i = list.length = func ? list.length : 0;
+    while(i--)
+        func == list[i][0] && list.splice(i,1)
     return target
   }
   /** 
    * Emit: send event, callbacks will be triggered
    */
-  target.emit = function(type){
+  target.trigger = function(type){
     var e = events[type] || empty, list = e.length > 0 ? e.slice(0, e.length) : e, i=0, j;
-    while(j=list[i++]) j[0].apply(j[1], empty.slice.call(arguments, 1))
+    while(j=list[i++]){
+        j[0].apply(j[1], empty.slice.call(arguments, 1));
+        if(j[2]) target.off(type, j[0]);
+    }
     return target
   };
-};
+}
+;

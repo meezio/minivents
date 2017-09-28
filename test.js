@@ -8,9 +8,9 @@ describe('Events "new" Constructor', function () {
       assert.equal('object', typeof bus);
   });
 
-  it('should contain an `emit` function', function () {
+  it('should contain an `trigger` function', function () {
     var bus = new Events();
-    assert.equal('function', typeof bus.emit);
+    assert.equal('function', typeof bus.trigger);
   });
 
   it('should contain an `off` function', function () {
@@ -33,10 +33,10 @@ describe('Events "mixin" Constructor', function () {
       assert.equal(undefined, ret);
   });
 
-  it('should contain an `emit` function', function () {
+  it('should contain an `trigger` function', function () {
     var bus = {};
     Events(bus);
-    assert.equal('function', typeof bus.emit);
+    assert.equal('function', typeof bus.trigger);
   });
 
   it('should contain an `off` function', function () {
@@ -118,7 +118,7 @@ describe('`off` function', function () {
         f = function () { assert.fail(undefined, undefined, 'This function must not be executed.'); };
     bus.on('ping', f);
     bus.off('ping', f);
-    bus.emit('ping');
+    bus.trigger('ping');
   });
 
   it('should return target', function () {
@@ -129,7 +129,47 @@ describe('`off` function', function () {
   });
 });
 
-describe('`emit` function',  function () {
+describe('`one` function', function () {
+  
+  it('should not throw any exceptions when called with a string and a function', function () {
+    var bus = new Events();
+    try {
+        bus.one('ping', function () { });
+    } catch (e) {
+        assert.fail(undefined, e, e.toString());
+    }
+  });
+
+  it('should not throw any exceptions when called with a string, a function and an object', function () {
+    var bus = new Events();
+    try {
+        bus.one('ping', function () { }, { });
+    } catch (e) {
+        assert.fail(undefined, e, e.toString());
+    }
+  });
+
+  it('should be executed only once',  function () {
+      var bus = new Events(),
+          called = 0,
+          f1 = function () { called++ },
+          f2 = function () { called++ };
+
+      bus.one('ping', f1);
+      bus.on('ping', f2);
+      bus.trigger('ping');
+      assert.equal(called, 2);
+      bus.trigger('ping');
+      assert.equal(called, 3);
+  });
+
+  it('should return target', function () {
+    var bus = new Events();
+    assert.equal(bus.one('ping', function () { }), bus);
+  });
+});
+
+describe('`trigger` function',  function () {
     it('should result in registered callbacks being invoked',  function () {
         var bus = new Events(),
             called = 0,
@@ -140,7 +180,7 @@ describe('`emit` function',  function () {
         bus.on('ping', f1);
         bus.on('ping', f2);
         bus.on('ping', f3);
-        bus.emit('ping');
+        bus.trigger('ping');
         assert.equal(called, 3);
     });
 
@@ -151,7 +191,7 @@ describe('`emit` function',  function () {
               assert.equal('bar', arg1);
             };
         bus.on('ping', f);
-        bus.emit('ping', 'foo', 'bar');
+        bus.trigger('ping', 'foo', 'bar');
     });
 
     it('should inject a callback\'s context',  function () {
@@ -159,7 +199,7 @@ describe('`emit` function',  function () {
             ctx = { }
             f = function () { assert.equal(ctx, this); };
         bus.on('ping', f, ctx);
-        bus.emit('ping');
+        bus.trigger('ping');
     });
 
     it('should result in registered callbacks being invoked with cascade',  function () {
@@ -169,7 +209,7 @@ describe('`emit` function',  function () {
             f1 = function () { called++ },
             f2 = function () { called++ },
             f3 = function () { called++ },
-            f4 = function () { bus.emit('cascade'); },
+            f4 = function () { bus.trigger('cascade'); },
             f5 = function () { called++ },
             f6 = function () { cascade = true; };
 
@@ -179,7 +219,7 @@ describe('`emit` function',  function () {
         bus.on('ping', f4);
         bus.on('ping', f5);
         bus.on('cascade', f6);
-        bus.emit('ping');
+        bus.trigger('ping');
 
         assert.equal(called, 4);
         assert.equal(cascade, true);
@@ -200,7 +240,7 @@ describe('`emit` function',  function () {
         bus.on('ping', f3);
         bus.on('ping', f4);
         bus.on('ping', f5);
-        bus.emit('ping');
+        bus.trigger('ping');
 
         assert.equal(called, 4);
     });
@@ -209,6 +249,6 @@ describe('`emit` function',  function () {
         var bus = new Events(),
             f = function () { };
         bus.on('ping', f);
-        assert.equal(bus.emit('ping'), bus);
+        assert.equal(bus.trigger('ping'), bus);
     });
 });

@@ -5,6 +5,8 @@ http://allouis.github.io/minivents/
 # API
 
 `on` : Listen to event. Params { type:`String`, callback:`Function` | context:`Object` }. Returns `target`.
+
+`one` : Listen to event, The callback is executed at most once. Params { type:`String`, callback:`Function` | context:`Object` }. Returns `target`.
     
 `off` : Stop listening to event. Params { type:`String` | callback:`Function` }. Returns `target`.
     

@@ -10,7 +10,7 @@ http://allouis.github.io/minivents/
     
 `off` : Stop listening to event. Params { type:`String` | callback:`Function` }. Returns `target`.
     
-`emit`: Emit event. Params { type:`String` | data:`Object` }. Returns `target`.
+`trigger`: Trigger event. Params { type:`String` | data:`Object` }. Returns `target`.
     
 # Constructor Example
 ```javascript
@@ -24,7 +24,7 @@ sandbox.emit("event"); //does stuff
 
 sandbox.off("event");
 
-sandbox.emit("event"); //does not do stuff
+sandbox.trigger("event"); //does not do stuff
 ```    
 # Mixin Example
 ```javascript
@@ -38,9 +38,9 @@ sandbox.on("event", function(){
     // do stuff
 });
 
-sandbox.emit("event"); //does stuff
+sandbox.trigger("event"); //does stuff
 
 sandbox.off("event");
 
-sandbox.emit("event"); //does not do stuff
+sandbox.trigger("event"); //does not do stuff
 ```
